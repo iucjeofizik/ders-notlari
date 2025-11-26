@@ -1,33 +1,38 @@
-name: Generate HTML Index
+name: Güncel Index Oluştur
 
 on:
-  push:
-    paths:
-      - 'ders-notlari/**'   # ders-notlari klasörüne yapılan değişikliklerde tetiklenir
-      - '.github/workflows/**'
-  workflow_dispatch:      # manuel çalıştırma seçeneği
+  workflow_dispatch:
+  schedule:
+    - cron: '0 2 * * *' # her gün 02:00'de çalıştır (isteğe göre değiştirin)
+
+permissions:
+  contents: write
 
 jobs:
-  build-index:
+  update-index:
     runs-on: ubuntu-latest
     steps:
-      - name: Repoyu checkout et
-        uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
 
-      - name: Python kur
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
 
-      - name: Index oluştur
-        run: |
-          pip install requests
-          python generate_index.py   # az önce hazırladığımız Python script
+      - name: Install deps
+        run: pip install requests
 
-      - name: Commit ve push
+      - name: Generate index
+        run: python generate_index.py
+
+      - name: Commit & push
         run: |
           git config --local user.name "github-actions"
-          git config --local user.email "actions@github.com"
+          git config --local user.email "github-actions@users.noreply.github.com"
           git add index.html
-          git commit -m "Otomatik güncel index"
-          git push
+          git commit -m "Otomatik güncel index" || echo "No changes to commit"
+          git push origin HEAD:main
