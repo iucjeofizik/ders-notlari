@@ -51,7 +51,7 @@ html_header_template = """<!DOCTYPE html>
 </head>
 <body>
 <h1>Ders Notları</h1>
-<p>Bu sayfada <strong>ders-notlari</strong> dizinine eklenen tüm dosyalar ağaç yapısında listelenir. Klasör isimlerine tıklayarak daraltıp/ genişletebilirsiniz.</p>
+<p>Bu sayfada <strong>ders-notlari</strong> dizinine eklenen tüm dosyalar listelenir. Klasör isimlerine tıklayarak daraltıp/ genişletebilirsiniz [nedense bir türlü çalıştıramadım bu özelliği boşverebilirsiniz :) ].</p>
 <p>Bant genişliği düşük oldugundan dosyalar yavaş yüklenebilir</p>
 <div id="readme">
 {readme_html}
@@ -241,7 +241,7 @@ def main():
     tree = collect_tree(base_url)
 
     parts = [html_header_template.format(readme_html=readme_html)]
-    parts.append("<h2>Ders Notları - Ağaç Görünümü</h2>\n")
+    parts.append("<h2>Ders Notları</h2>\n")
     if not tree:
         parts.append("<p>Henüz dosya bulunmamaktadır.</p>\n")
     else:
