@@ -3,10 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <title>Ders Notları</title>
+<style>
+  body { font-family: sans-serif; line-height: 1.5; padding: 1rem; }
+  .tree { margin: 0; padding: 0; }
+  .tree ul { list-style: none; margin: 0; padding-left: 1.25rem; }
+  .caret { cursor: pointer; user-select: none; display: inline-block; }
+  .caret .symbol { display: inline-block; width: 1.0rem; }
+  .nested { display: none; }
+  .nested.active { display: block; }
+  .file a { text-decoration: none; color: #0366d6; }
+  .file a:hover { text-decoration: underline; }
+  .empty { font-style: italic; color: #888; margin-left: 1.25rem; }
+</style>
 </head>
 <body>
 <h1>Ders Notları</h1>
-<p>Bu sayfada <strong>ders-notlari</strong> dizinine eklenen tüm dosyalar listelenir.</p>
+<p>Bu sayfada <strong>ders-notlari</strong> dizinine eklenen tüm dosyalar ağaç yapısında listelenir. Klasör isimlerine tıklayarak daraltıp/ genişletebilirsiniz.</p>
 <div id="readme">
 <pre>Bu sayfa iücjeofizik.com web sitesinde paylaşılıcak olan sanal kütüphaneyi barındırmak için kurulmuştur.
 Ders notlarına daha rahat erişim için lütfen web sitesini kullanın 
@@ -15,57 +27,164 @@ www.iücjeofizik.com
 </pre>
 </div>
 <hr/>
-<h2>Tüm Dosyalar</h2>
-<ul>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/1.s%C4%B1n%C4%B1f/temp" target="_blank">1.sınıf/temp</a> <small>(temp)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Jeofizik%20ve%20tarihsel%20geli%C5%9Fimi/jeofizik-ve-tarihsel-gelisimi.pdf" target="_blank">2.sinif/Jeofizik ve tarihsel gelişimi/jeofizik-ve-tarihsel-gelisimi.pdf</a> <small>(jeofizik-ve-tarihsel-gelisimi.pdf)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Jeofizikte%20Bilgisayar%20Uygulamalar%C4%B1/En%20k%C3%BC%C3%A7%C3%BCk%20kareler%20y%C3%B6ntemi.pptx" target="_blank">2.sinif/Jeofizikte Bilgisayar Uygulamaları/En küçük kareler yöntemi.pptx</a> <small>(En küçük kareler yöntemi.pptx)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Jeofizikte%20Bilgisayar%20Uygulamalar%C4%B1/jeofizikte-bilgisayar-uygulamalar%C4%B1-1-7-Uygulamalar.pdf" target="_blank">2.sinif/Jeofizikte Bilgisayar Uygulamaları/jeofizikte-bilgisayar-uygulamaları-1-7-Uygulamalar.pdf</a> <small>(jeofizikte-bilgisayar-uygulamaları-1-7-Uygulamalar.pdf)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Jeofizikte%20Bilgisayar%20Uygulamalar%C4%B1/tekrar.ppt" target="_blank">2.sinif/Jeofizikte Bilgisayar Uygulamaları/tekrar.ppt</a> <small>(tekrar.ppt)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Mineroloji%20Petrografi/MinPet-Ders-1-notlar%C4%B1.pdf" target="_blank">2.sinif/Mineroloji Petrografi/MinPet-Ders-1-notları.pdf</a> <small>(MinPet-Ders-1-notları.pdf)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Mineroloji%20Petrografi/MinPet-Ders-2-notlar%C4%B1.pdf" target="_blank">2.sinif/Mineroloji Petrografi/MinPet-Ders-2-notları.pdf</a> <small>(MinPet-Ders-2-notları.pdf)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Mineroloji%20Petrografi/MinPet-Ders-3-notlar%C4%B1.pdf" target="_blank">2.sinif/Mineroloji Petrografi/MinPet-Ders-3-notları.pdf</a> <small>(MinPet-Ders-3-notları.pdf)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Mineroloji%20Petrografi/MinPet-Ders-4-notlar%C4%B1.pdf" target="_blank">2.sinif/Mineroloji Petrografi/MinPet-Ders-4-notları.pdf</a> <small>(MinPet-Ders-4-notları.pdf)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Veri%20i%C5%9Flem/1.pdf" target="_blank">2.sinif/Veri işlem/1.pdf</a> <small>(1.pdf)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Veri%20i%C5%9Flem/2.pdf" target="_blank">2.sinif/Veri işlem/2.pdf</a> <small>(2.pdf)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Veri%20i%C5%9Flem/3.pdf" target="_blank">2.sinif/Veri işlem/3.pdf</a> <small>(3.pdf)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Yer%20bilimlerinde%20matlab/YBM_ders_1.pptx" target="_blank">2.sinif/Yer bilimlerinde matlab/YBM_ders_1.pptx</a> <small>(YBM_ders_1.pptx)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Yer%20bilimlerinde%20matlab/YBM_ders_2.pptx" target="_blank">2.sinif/Yer bilimlerinde matlab/YBM_ders_2.pptx</a> <small>(YBM_ders_2.pptx)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Yer%20bilimlerinde%20matlab/YBM_ders_3.pptx" target="_blank">2.sinif/Yer bilimlerinde matlab/YBM_ders_3.pptx</a> <small>(YBM_ders_3.pptx)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Yer%20bilimlerinde%20matlab/YBM_ders_4.pptx" target="_blank">2.sinif/Yer bilimlerinde matlab/YBM_ders_4.pptx</a> <small>(YBM_ders_4.pptx)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Yer%20bilimlerinde%20matlab/YBM_ders_5.pptx" target="_blank">2.sinif/Yer bilimlerinde matlab/YBM_ders_5.pptx</a> <small>(YBM_ders_5.pptx)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Yer%20bilimlerinde%20matlab/YBM_ders_6.pptx" target="_blank">2.sinif/Yer bilimlerinde matlab/YBM_ders_6.pptx</a> <small>(YBM_ders_6.pptx)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Yer%20bilimlerinde%20matlab/YBM_ders_7.pptx" target="_blank">2.sinif/Yer bilimlerinde matlab/YBM_ders_7.pptx</a> <small>(YBM_ders_7.pptx)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/bilim%20felsefesi%20ve%20tarihi/bilim-felsefesi-ve-tarihi.ppt" target="_blank">2.sinif/bilim felsefesi ve tarihi/bilim-felsefesi-ve-tarihi.ppt</a> <small>(bilim-felsefesi-ve-tarihi.ppt)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/elastik%20dalga%20yay%C4%B1n%C4%B1m%C4%B1/1-ders-basit-harmonik-hareket.pdf" target="_blank">2.sinif/elastik dalga yayınımı/1-ders-basit-harmonik-hareket.pdf</a> <small>(1-ders-basit-harmonik-hareket.pdf)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/elastik%20dalga%20yay%C4%B1n%C4%B1m%C4%B1/10-ders-sismik-y%C3%BCzey-dalgalar%C4%B1.pdf" target="_blank">2.sinif/elastik dalga yayınımı/10-ders-sismik-yüzey-dalgaları.pdf</a> <small>(10-ders-sismik-yüzey-dalgaları.pdf)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/elastik%20dalga%20yay%C4%B1n%C4%B1m%C4%B1/2-ders-dairesel-s%C3%B6nml%C3%BC.pdf" target="_blank">2.sinif/elastik dalga yayınımı/2-ders-dairesel-sönmlü.pdf</a> <small>(2-ders-dairesel-sönmlü.pdf)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/elastik%20dalga%20yay%C4%B1n%C4%B1m%C4%B1/3-ders-zoruna-hareket-sismograf.pdf" target="_blank">2.sinif/elastik dalga yayınımı/3-ders-zoruna-hareket-sismograf.pdf</a> <small>(3-ders-zoruna-hareket-sismograf.pdf)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/elastik%20dalga%20yay%C4%B1n%C4%B1m%C4%B1/4-ders-dalga-hareketi.pdf" target="_blank">2.sinif/elastik dalga yayınımı/4-ders-dalga-hareketi.pdf</a> <small>(4-ders-dalga-hareketi.pdf)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/elastik%20dalga%20yay%C4%B1n%C4%B1m%C4%B1/5-ders-giri%C5%9Fim.pdf" target="_blank">2.sinif/elastik dalga yayınımı/5-ders-girişim.pdf</a> <small>(5-ders-girişim.pdf)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/elastik%20dalga%20yay%C4%B1n%C4%B1m%C4%B1/6-ders-yans%C4%B1yan-iletilen-dalgalar.pdf" target="_blank">2.sinif/elastik dalga yayınımı/6-ders-yansıyan-iletilen-dalgalar.pdf</a> <small>(6-ders-yansıyan-iletilen-dalgalar.pdf)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/elastik%20dalga%20yay%C4%B1n%C4%B1m%C4%B1/7-ders-elastisite-teorisi.pdf" target="_blank">2.sinif/elastik dalga yayınımı/7-ders-elastisite-teorisi.pdf</a> <small>(7-ders-elastisite-teorisi.pdf)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/elastik%20dalga%20yay%C4%B1n%C4%B1m%C4%B1/8-ders-gerilme-deformasyon-ba%C4%9F%C4%B1nt%C4%B1lar%C4%B1.pdf" target="_blank">2.sinif/elastik dalga yayınımı/8-ders-gerilme-deformasyon-bağıntıları.pdf</a> <small>(8-ders-gerilme-deformasyon-bağıntıları.pdf)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/elastik%20dalga%20yay%C4%B1n%C4%B1m%C4%B1/9-ders-ps-snell.pdf" target="_blank">2.sinif/elastik dalga yayınımı/9-ders-ps-snell.pdf</a> <small>(9-ders-ps-snell.pdf)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/3.sinif/2017%20%E2%80%93%202018%20S%C4%B0SM%C4%B0K%20PROSPEKS%C4%B0YON%20DERS%20NOTLARI/ders-11.ppt" target="_blank">3.sinif/2017 – 2018 SİSMİK PROSPEKSİYON DERS NOTLARI/ders-11.ppt</a> <small>(ders-11.ppt)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/3.sinif/2017%20%E2%80%93%202018%20S%C4%B0SM%C4%B0K%20PROSPEKS%C4%B0YON%20DERS%20NOTLARI/ders-22.ppt" target="_blank">3.sinif/2017 – 2018 SİSMİK PROSPEKSİYON DERS NOTLARI/ders-22.ppt</a> <small>(ders-22.ppt)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/3.sinif/2017%20%E2%80%93%202018%20S%C4%B0SM%C4%B0K%20PROSPEKS%C4%B0YON%20DERS%20NOTLARI/ders-3.ppt" target="_blank">3.sinif/2017 – 2018 SİSMİK PROSPEKSİYON DERS NOTLARI/ders-3.ppt</a> <small>(ders-3.ppt)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/3.sinif/2017%20%E2%80%93%202018%20S%C4%B0SM%C4%B0K%20PROSPEKS%C4%B0YON%20DERS%20NOTLARI/ders-51.ppt" target="_blank">3.sinif/2017 – 2018 SİSMİK PROSPEKSİYON DERS NOTLARI/ders-51.ppt</a> <small>(ders-51.ppt)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/3.sinif/2017%20%E2%80%93%202018%20S%C4%B0SM%C4%B0K%20PROSPEKS%C4%B0YON%20DERS%20NOTLARI/ders-61.ppt" target="_blank">3.sinif/2017 – 2018 SİSMİK PROSPEKSİYON DERS NOTLARI/ders-61.ppt</a> <small>(ders-61.ppt)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/3.sinif/2017%20%E2%80%93%202018%20S%C4%B0SM%C4%B0K%20PROSPEKS%C4%B0YON%20DERS%20NOTLARI/ders-72.ppt" target="_blank">3.sinif/2017 – 2018 SİSMİK PROSPEKSİYON DERS NOTLARI/ders-72.ppt</a> <small>(ders-72.ppt)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/3.sinif/3.txt" target="_blank">3.sinif/3.txt</a> <small>(3.txt)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/3.sinif/sismoloji/1-ders-sismolojiye-genel-bakis.pdf" target="_blank">3.sinif/sismoloji/1-ders-sismolojiye-genel-bakis.pdf</a> <small>(1-ders-sismolojiye-genel-bakis.pdf)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/3.sinif/sismoloji/2-ders-depremlerin-kayit-edilmesi.pdf" target="_blank">3.sinif/sismoloji/2-ders-depremlerin-kayit-edilmesi.pdf</a> <small>(2-ders-depremlerin-kayit-edilmesi.pdf)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/3.sinif/sismoloji/3-ders-elastisite.pdf" target="_blank">3.sinif/sismoloji/3-ders-elastisite.pdf</a> <small>(3-ders-elastisite.pdf)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/3.sinif/sismoloji/4_ders_sismik_dalgalar.pdf" target="_blank">3.sinif/sismoloji/4_ders_sismik_dalgalar.pdf</a> <small>(4_ders_sismik_dalgalar.pdf)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/3.sinif/sismoloji/5-ders-y%C3%BCzey-dalgalari.pdf" target="_blank">3.sinif/sismoloji/5-ders-yüzey-dalgalari.pdf</a> <small>(5-ders-yüzey-dalgalari.pdf)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/3.sinif/sismoloji/6-ders-depremler-ve-parametreleri.pdf" target="_blank">3.sinif/sismoloji/6-ders-depremler-ve-parametreleri.pdf</a> <small>(6-ders-depremler-ve-parametreleri.pdf)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/3.sinif/sismoloji/7-ders-deprem-b%C3%BCy%C3%BCkl%C3%BC%C4%9F%C3%BC.pdf" target="_blank">3.sinif/sismoloji/7-ders-deprem-büyüklüğü.pdf</a> <small>(7-ders-deprem-büyüklüğü.pdf)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/3.sinif/sismoloji/8-ders-deprem-istatisti%C4%9Fi.pdf" target="_blank">3.sinif/sismoloji/8-ders-deprem-istatistiği.pdf</a> <small>(8-ders-deprem-istatistiği.pdf)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/3.sinif/sismoloji/9-ders-deprem-odak-mekanizmasi.pdf" target="_blank">3.sinif/sismoloji/9-ders-deprem-odak-mekanizmasi.pdf</a> <small>(9-ders-deprem-odak-mekanizmasi.pdf)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/4.sinif/4.txt" target="_blank">4.sinif/4.txt</a> <small>(4.txt)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/4.sinif/academic%20reading%201.pdf" target="_blank">4.sinif/academic reading 1.pdf</a> <small>(academic reading 1.pdf)</small></li>
-  <li><a href="https://not.iücjeofizik.com/ders-notlari/4.sinif/acedemic%20writing.pdf" target="_blank">4.sinif/acedemic writing.pdf</a> <small>(acedemic writing.pdf)</small></li>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  var carets = document.getElementsByClassName("caret");
+  Array.prototype.forEach.call(carets, function(c) {
+    c.addEventListener("click", function(e) {
+      var nested = this.parentElement.querySelector(".nested");
+      if (!nested) return;
+      nested.classList.toggle("active");
+      var sym = this.querySelector(".symbol");
+      if (sym) {
+        sym.textContent = nested.classList.contains("active") ? "▼" : "▶";
+      }
+    });
+  });
+});
+</script>
+<h2>Ders Notları - Ağaç Görünümü</h2>
+<ul class="tree">
+<li>
+  <span class="caret"><span class="symbol">▶</span> 1.sınıf</span>
+<div class="nested">
+<ul class="tree">
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/1.s%C4%B1n%C4%B1f/temp" target="_blank">temp</a></li>
+</ul>
+</div>
+</li>
+<li>
+  <span class="caret"><span class="symbol">▶</span> 2.sinif</span>
+<div class="nested">
+<ul class="tree">
+<li>
+  <span class="caret"><span class="symbol">▶</span> bilim felsefesi ve tarihi</span>
+<div class="nested">
+<ul class="tree">
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/bilim%20felsefesi%20ve%20tarihi/bilim-felsefesi-ve-tarihi.ppt" target="_blank">bilim-felsefesi-ve-tarihi.ppt</a></li>
+</ul>
+</div>
+</li>
+<li>
+  <span class="caret"><span class="symbol">▶</span> elastik dalga yayınımı</span>
+<div class="nested">
+<ul class="tree">
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/elastik%20dalga%20yay%C4%B1n%C4%B1m%C4%B1/1-ders-basit-harmonik-hareket.pdf" target="_blank">1-ders-basit-harmonik-hareket.pdf</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/elastik%20dalga%20yay%C4%B1n%C4%B1m%C4%B1/10-ders-sismik-y%C3%BCzey-dalgalar%C4%B1.pdf" target="_blank">10-ders-sismik-yüzey-dalgaları.pdf</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/elastik%20dalga%20yay%C4%B1n%C4%B1m%C4%B1/2-ders-dairesel-s%C3%B6nml%C3%BC.pdf" target="_blank">2-ders-dairesel-sönmlü.pdf</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/elastik%20dalga%20yay%C4%B1n%C4%B1m%C4%B1/3-ders-zoruna-hareket-sismograf.pdf" target="_blank">3-ders-zoruna-hareket-sismograf.pdf</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/elastik%20dalga%20yay%C4%B1n%C4%B1m%C4%B1/4-ders-dalga-hareketi.pdf" target="_blank">4-ders-dalga-hareketi.pdf</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/elastik%20dalga%20yay%C4%B1n%C4%B1m%C4%B1/5-ders-giri%C5%9Fim.pdf" target="_blank">5-ders-girişim.pdf</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/elastik%20dalga%20yay%C4%B1n%C4%B1m%C4%B1/6-ders-yans%C4%B1yan-iletilen-dalgalar.pdf" target="_blank">6-ders-yansıyan-iletilen-dalgalar.pdf</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/elastik%20dalga%20yay%C4%B1n%C4%B1m%C4%B1/7-ders-elastisite-teorisi.pdf" target="_blank">7-ders-elastisite-teorisi.pdf</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/elastik%20dalga%20yay%C4%B1n%C4%B1m%C4%B1/8-ders-gerilme-deformasyon-ba%C4%9F%C4%B1nt%C4%B1lar%C4%B1.pdf" target="_blank">8-ders-gerilme-deformasyon-bağıntıları.pdf</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/elastik%20dalga%20yay%C4%B1n%C4%B1m%C4%B1/9-ders-ps-snell.pdf" target="_blank">9-ders-ps-snell.pdf</a></li>
+</ul>
+</div>
+</li>
+<li>
+  <span class="caret"><span class="symbol">▶</span> Jeofizik ve tarihsel gelişimi</span>
+<div class="nested">
+<ul class="tree">
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Jeofizik%20ve%20tarihsel%20geli%C5%9Fimi/jeofizik-ve-tarihsel-gelisimi.pdf" target="_blank">jeofizik-ve-tarihsel-gelisimi.pdf</a></li>
+</ul>
+</div>
+</li>
+<li>
+  <span class="caret"><span class="symbol">▶</span> Jeofizikte Bilgisayar Uygulamaları</span>
+<div class="nested">
+<ul class="tree">
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Jeofizikte%20Bilgisayar%20Uygulamalar%C4%B1/En%20k%C3%BC%C3%A7%C3%BCk%20kareler%20y%C3%B6ntemi.pptx" target="_blank">En küçük kareler yöntemi.pptx</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Jeofizikte%20Bilgisayar%20Uygulamalar%C4%B1/jeofizikte-bilgisayar-uygulamalar%C4%B1-1-7-Uygulamalar.pdf" target="_blank">jeofizikte-bilgisayar-uygulamaları-1-7-Uygulamalar.pdf</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Jeofizikte%20Bilgisayar%20Uygulamalar%C4%B1/tekrar.ppt" target="_blank">tekrar.ppt</a></li>
+</ul>
+</div>
+</li>
+<li>
+  <span class="caret"><span class="symbol">▶</span> Mineroloji Petrografi</span>
+<div class="nested">
+<ul class="tree">
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Mineroloji%20Petrografi/MinPet-Ders-1-notlar%C4%B1.pdf" target="_blank">MinPet-Ders-1-notları.pdf</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Mineroloji%20Petrografi/MinPet-Ders-2-notlar%C4%B1.pdf" target="_blank">MinPet-Ders-2-notları.pdf</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Mineroloji%20Petrografi/MinPet-Ders-3-notlar%C4%B1.pdf" target="_blank">MinPet-Ders-3-notları.pdf</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Mineroloji%20Petrografi/MinPet-Ders-4-notlar%C4%B1.pdf" target="_blank">MinPet-Ders-4-notları.pdf</a></li>
+</ul>
+</div>
+</li>
+<li>
+  <span class="caret"><span class="symbol">▶</span> Veri işlem</span>
+<div class="nested">
+<ul class="tree">
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Veri%20i%C5%9Flem/1.pdf" target="_blank">1.pdf</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Veri%20i%C5%9Flem/2.pdf" target="_blank">2.pdf</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Veri%20i%C5%9Flem/3.pdf" target="_blank">3.pdf</a></li>
+</ul>
+</div>
+</li>
+<li>
+  <span class="caret"><span class="symbol">▶</span> Yer bilimlerinde matlab</span>
+<div class="nested">
+<ul class="tree">
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Yer%20bilimlerinde%20matlab/YBM_ders_1.pptx" target="_blank">YBM_ders_1.pptx</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Yer%20bilimlerinde%20matlab/YBM_ders_2.pptx" target="_blank">YBM_ders_2.pptx</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Yer%20bilimlerinde%20matlab/YBM_ders_3.pptx" target="_blank">YBM_ders_3.pptx</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Yer%20bilimlerinde%20matlab/YBM_ders_4.pptx" target="_blank">YBM_ders_4.pptx</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Yer%20bilimlerinde%20matlab/YBM_ders_5.pptx" target="_blank">YBM_ders_5.pptx</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Yer%20bilimlerinde%20matlab/YBM_ders_6.pptx" target="_blank">YBM_ders_6.pptx</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/2.sinif/Yer%20bilimlerinde%20matlab/YBM_ders_7.pptx" target="_blank">YBM_ders_7.pptx</a></li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+  <span class="caret"><span class="symbol">▶</span> 3.sinif</span>
+<div class="nested">
+<ul class="tree">
+<li>
+  <span class="caret"><span class="symbol">▶</span> 2017 – 2018 SİSMİK PROSPEKSİYON DERS NOTLARI</span>
+<div class="nested">
+<ul class="tree">
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/3.sinif/2017%20%E2%80%93%202018%20S%C4%B0SM%C4%B0K%20PROSPEKS%C4%B0YON%20DERS%20NOTLARI/ders-11.ppt" target="_blank">ders-11.ppt</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/3.sinif/2017%20%E2%80%93%202018%20S%C4%B0SM%C4%B0K%20PROSPEKS%C4%B0YON%20DERS%20NOTLARI/ders-22.ppt" target="_blank">ders-22.ppt</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/3.sinif/2017%20%E2%80%93%202018%20S%C4%B0SM%C4%B0K%20PROSPEKS%C4%B0YON%20DERS%20NOTLARI/ders-3.ppt" target="_blank">ders-3.ppt</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/3.sinif/2017%20%E2%80%93%202018%20S%C4%B0SM%C4%B0K%20PROSPEKS%C4%B0YON%20DERS%20NOTLARI/ders-51.ppt" target="_blank">ders-51.ppt</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/3.sinif/2017%20%E2%80%93%202018%20S%C4%B0SM%C4%B0K%20PROSPEKS%C4%B0YON%20DERS%20NOTLARI/ders-61.ppt" target="_blank">ders-61.ppt</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/3.sinif/2017%20%E2%80%93%202018%20S%C4%B0SM%C4%B0K%20PROSPEKS%C4%B0YON%20DERS%20NOTLARI/ders-72.ppt" target="_blank">ders-72.ppt</a></li>
+</ul>
+</div>
+</li>
+<li>
+  <span class="caret"><span class="symbol">▶</span> sismoloji</span>
+<div class="nested">
+<ul class="tree">
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/3.sinif/sismoloji/1-ders-sismolojiye-genel-bakis.pdf" target="_blank">1-ders-sismolojiye-genel-bakis.pdf</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/3.sinif/sismoloji/2-ders-depremlerin-kayit-edilmesi.pdf" target="_blank">2-ders-depremlerin-kayit-edilmesi.pdf</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/3.sinif/sismoloji/3-ders-elastisite.pdf" target="_blank">3-ders-elastisite.pdf</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/3.sinif/sismoloji/4_ders_sismik_dalgalar.pdf" target="_blank">4_ders_sismik_dalgalar.pdf</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/3.sinif/sismoloji/5-ders-y%C3%BCzey-dalgalari.pdf" target="_blank">5-ders-yüzey-dalgalari.pdf</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/3.sinif/sismoloji/6-ders-depremler-ve-parametreleri.pdf" target="_blank">6-ders-depremler-ve-parametreleri.pdf</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/3.sinif/sismoloji/7-ders-deprem-b%C3%BCy%C3%BCkl%C3%BC%C4%9F%C3%BC.pdf" target="_blank">7-ders-deprem-büyüklüğü.pdf</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/3.sinif/sismoloji/8-ders-deprem-istatisti%C4%9Fi.pdf" target="_blank">8-ders-deprem-istatistiği.pdf</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/3.sinif/sismoloji/9-ders-deprem-odak-mekanizmasi.pdf" target="_blank">9-ders-deprem-odak-mekanizmasi.pdf</a></li>
+</ul>
+</div>
+</li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/3.sinif/3.txt" target="_blank">3.txt</a></li>
+</ul>
+</div>
+</li>
+<li>
+  <span class="caret"><span class="symbol">▶</span> 4.sinif</span>
+<div class="nested">
+<ul class="tree">
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/4.sinif/4.txt" target="_blank">4.txt</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/4.sinif/academic%20reading%201.pdf" target="_blank">academic reading 1.pdf</a></li>
+  <li class="file"><a href="https://not.iücjeofizik.com/ders-notlari/4.sinif/acedemic%20writing.pdf" target="_blank">acedemic writing.pdf</a></li>
+</ul>
+</div>
+</li>
 </ul>
 
 </body>
