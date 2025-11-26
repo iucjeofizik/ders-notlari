@@ -2,7 +2,7 @@ import requests
 
 # GitHub bilgileri
 user = "kullaniciAdi"      # GitHub kullanıcı adınız
-repo = "repoAdi"           # Repo adı
+repo = "ders-notlari"           # Repo adı
 branch = "main"            # Branch adı
 output_file = "index.html" # Oluşturulacak HTML dosyası
 
