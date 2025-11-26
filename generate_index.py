@@ -52,6 +52,7 @@ html_header_template = """<!DOCTYPE html>
 <body>
 <h1>Ders Notları</h1>
 <p>Bu sayfada <strong>ders-notlari</strong> dizinine eklenen tüm dosyalar ağaç yapısında listelenir. Klasör isimlerine tıklayarak daraltıp/ genişletebilirsiniz.</p>
+<p>Bant genişliği düşük oldugundan dosyalar yavaş yüklenebilir</p>
 <div id="readme">
 {readme_html}
 </div>
