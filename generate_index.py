@@ -2,14 +2,9 @@
 # -*- coding: utf-8 -*-
 """
 Ders notları dizini için index oluşturucu.
-- Tüm dosya türleri gösterilir.
-- Alt klasörler recursive olarak taranır.
-- Çıktıda her dosya için repository içindeki relatif yol gösterilir ve
-  GitHub Pages altında erişim linki üretilir.
-
-Ayarlamalar:
- - user, repo, branch, root_path ve base_site değerlerini gerektiğinde düzenleyin.
- - Eğer private repo ise GITHUB_TOKEN environment variable olarak ekleyin.
+- Ağaç yapısında (klasör) çıktı üretir.
+- Klasörler daraltılıp/genişletilebilir (JS ile).
+- Dosya bağlantıları sadece dosya adı üzerine embed edilmiş şekilde gösterilir (tam path gösterilmez).
 """
 import os
 import sys
@@ -41,14 +36,42 @@ html_header_template = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <title>Ders Notları</title>
+<style>
+  body { font-family: sans-serif; line-height: 1.5; padding: 1rem; }
+  .tree { margin: 0; padding: 0; }
+  .tree ul { list-style: none; margin: 0; padding-left: 1.25rem; }
+  .caret { cursor: pointer; user-select: none; display: inline-block; }
+  .caret .symbol { display: inline-block; width: 1.0rem; }
+  .nested { display: none; }
+  .nested.active { display: block; }
+  .file a { text-decoration: none; color: #0366d6; }
+  .file a:hover { text-decoration: underline; }
+  .empty { font-style: italic; color: #888; margin-left: 1.25rem; }
+</style>
 </head>
 <body>
 <h1>Ders Notları</h1>
-<p>Bu sayfada <strong>ders-notlari</strong> dizinine eklenen tüm dosyalar listelenir.</p>
+<p>Bu sayfada <strong>ders-notlari</strong> dizinine eklenen tüm dosyalar ağaç yapısında listelenir. Klasör isimlerine tıklayarak daraltıp/ genişletebilirsiniz.</p>
 <div id="readme">
 {readme_html}
 </div>
 <hr/>
+<script>
+document.addEventListener("DOMContentLoaded", function() {{
+  var carets = document.getElementsByClassName("caret");
+  Array.prototype.forEach.call(carets, function(c) {{
+    c.addEventListener("click", function(e) {{
+      var nested = this.parentElement.querySelector(".nested");
+      if (!nested) return;
+      nested.classList.toggle("active");
+      var sym = this.querySelector(".symbol");
+      if (sym) {{
+        sym.textContent = nested.classList.contains("active") ? "▼" : "▶";
+      }}
+    }});
+  }});
+}});
+</script>
 """
 
 html_footer = """
@@ -65,7 +88,6 @@ def get_json(url):
         sys.exit(1)
     if resp.status_code != 200:
         print(f"Beklenmeyen status kodu {resp.status_code} for {url}: {resp.text}", file=sys.stderr)
-        # Return None so caller can handle non-200 (e.g., empty dir or not found)
         return None
     try:
         return resp.json()
@@ -74,11 +96,6 @@ def get_json(url):
         return None
 
 def try_local_readme():
-    """
-    Yerel README dosyalarını kontrol et.
-    Öncelik: ./README.md, ./README.rst, ./{root_path}/README.md, ./{root_path}/README.rst
-    Döndürür: (content:str, format:str) format 'md' veya 'rst' veya 'text' - (None, None) dönebilir
-    """
     candidates = ["README.md", "README.rst"]
     if root_path:
         candidates += [os.path.join(root_path, "README.md"), os.path.join(root_path, "README.rst")]
@@ -96,10 +113,6 @@ def try_local_readme():
     return None, None
 
 def try_github_readme_via_api():
-    """
-    GitHub API /repos/{owner}/{repo}/readme endpoint'inden README'yi al.
-    Döndürür (text, format) veya (None, None).
-    """
     try:
         resp = requests.get(readme_api_url, headers=headers, timeout=15)
     except requests.RequestException as e:
@@ -130,10 +143,6 @@ def try_github_readme_via_api():
     return decoded, "text"
 
 def render_readme_to_html(text, fmt):
-    """
-    Eğer 'markdown' paketi yüklüyse md -> HTML çevir, yoksa <pre> içinde ham göster.
-    RST için dönüşüm yapılmıyor (pre içine konur) — isterseniz docutils eklenebilir.
-    """
     if not text:
         return "<p>README bulunamadı.</p>"
     if fmt == "md":
@@ -148,36 +157,39 @@ def render_readme_to_html(text, fmt):
         safe = html.escape(text)
         return f"<pre>{safe}</pre>"
 
-def collect_files(url, collected):
+def collect_tree(url):
     """
-    response of GitHub contents API for a directory is a list of items.
-    This function appends dicts {path, name} into collected for files,
-    and recurses into directories.
+    Build a tree from GitHub contents API for the given directory.
+    Nodes:
+     - dir: {'type':'dir','name':..., 'path':..., 'children':[...]}
+     - file: {'type':'file','name':..., 'path':...}
     """
     response = get_json(url)
     if not isinstance(response, list):
-        # nothing to do (could be None or an error)
-        return
+        return []
+    nodes = []
     for item in response:
         if not isinstance(item, dict):
             continue
         itype = item.get('type')
-        if itype == 'file':
-            collected.append({
-                "path": item.get('path'),
+        if itype == 'dir':
+            children = collect_tree(item.get('url'))
+            nodes.append({
+                "type": "dir",
                 "name": item.get('name'),
+                "path": item.get('path'),
+                "children": children
             })
-        elif itype == 'dir':
-            # recurse into directory using the provided 'url' field for the directory
-            collect_files(item.get('url'), collected)
-        # symlink/submodule ignored
+        elif itype == 'file':
+            nodes.append({
+                "type": "file",
+                "name": item.get('name'),
+                "path": item.get('path'),
+            })
+    nodes.sort(key=lambda n: (0 if n.get('type') == 'dir' else 1, (n.get('name') or "").lower()))
+    return nodes
 
 def make_link_for_item(item_path):
-    """
-    Given repo path like "ders-notlari/Hafta1/dosya.pdf", produce the public link:
-    base_site + "/" + part_after_root (URL-encoded, preserving slashes).
-    If root_path is empty, use whole path after repo root.
-    """
     path = item_path or ""
     if root_path:
         prefix = root_path.rstrip('/') + '/'
@@ -190,43 +202,65 @@ def make_link_for_item(item_path):
     encoded = quote(rel, safe="/")
     return f"{base_site}/{encoded}"
 
+def render_nodes(nodes):
+    """
+    Recursively render nodes as <ul>/<li>. Fark: dosyalar sadece dosya adı ile gösterilir
+    ve dosya adı link'e gömülüdür. Klasörler daraltılabilir/gevşetilebilir.
+    """
+    out = ["<ul class=\"tree\">\n"]
+    for n in nodes:
+        if n.get('type') == 'dir':
+            children = n.get('children') or []
+            out.append('<li>\n')
+            # caret with symbol
+            out.append(f'  <span class="caret"><span class="symbol">▶</span> {html.escape(n.get("name") or "")}</span>\n')
+            if children:
+                out.append('<div class="nested">\n')
+                out.append(render_nodes(children))
+                out.append('</div>\n')
+            else:
+                out.append('<div class="nested"><div class="empty">(boş)</div></div>\n')
+            out.append('</li>\n')
+        else:
+            path = n.get('path', '')
+            name = n.get('name', '')
+            link = make_link_for_item(path)
+            # Only show the file name as the link text (no full path)
+            out.append(f'  <li class="file"><a href="{link}" target="_blank">{html.escape(name)}</a></li>\n')
+    out.append("</ul>\n")
+    return ''.join(out)
+
 def main():
     print("Base API URL:", base_url)
-    # README al (önce yerel, sonra API)
     readme_text, readme_fmt = try_local_readme()
     if readme_text is None:
         readme_text, readme_fmt = try_github_readme_via_api()
     readme_html = render_readme_to_html(readme_text, readme_fmt)
 
-    # dosyaları topla
-    files = []
-    collect_files(base_url, files)
+    tree = collect_tree(base_url)
 
-    # Sort by path for predictable ordering
-    files.sort(key=lambda x: x['path'] or "")
-
-    # Build HTML
     parts = [html_header_template.format(readme_html=readme_html)]
-    parts.append("<h2>Tüm Dosyalar</h2>\n<ul>\n")
-    if not files:
-        parts.append("<li>Henüz dosya bulunmamaktadır.</li>\n")
+    parts.append("<h2>Ders Notları - Ağaç Görünümü</h2>\n")
+    if not tree:
+        parts.append("<p>Henüz dosya bulunmamaktadır.</p>\n")
     else:
-        for f in files:
-            path = f.get('path', '')
-            name = f.get('name', '')
-            link = make_link_for_item(path)
-            if root_path and path.startswith(root_path.rstrip('/') + '/'):
-                display_path = path[len(root_path.rstrip('/') + '/'):]
-            else:
-                display_path = path or name
-            parts.append(f'  <li><a href="{link}" target="_blank">{html.escape(display_path)}</a> <small>({html.escape(name)})</small></li>\n')
-    parts.append("</ul>\n")
+        parts.append(render_nodes(tree))
     parts.append(html_footer)
 
     with open(output_file, "w", encoding="utf-8") as f:
         f.write(''.join(parts))
 
-    print(f"Index dosyası oluşturuldu: {output_file} (toplam {len(files)} dosya)")
+    def count_files(nodes):
+        c = 0
+        for n in nodes:
+            if n.get('type') == 'file':
+                c += 1
+            else:
+                c += count_files(n.get('children') or [])
+        return c
+
+    total_files = count_files(tree)
+    print(f"Index dosyası oluşturuldu: {output_file} (toplam {total_files} dosya)")
 
 if __name__ == "__main__":
     main()
