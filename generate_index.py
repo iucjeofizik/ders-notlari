@@ -3,16 +3,11 @@
 """
 Ders notları index oluşturucu (düzgün hata kontrolü ile)
 
-Değişiklikler:
-- GITHUB_TOKEN environment variable ile private repolar için token desteği
-- API response status ve tip kontrolü
-- requests hatalarında çıkış ve anlamlı hata mesajı
-- URL encode ile dosya ve klasör isimleri güvenli hale getirildi
-- Daha sağlam JSON parse kontrolü
-
-Kullanım:
- - (Opsiyonel) export GITHUB_TOKEN="ghp_..." (Linux/macOS) veya set GITHUB_TOKEN on Windows
- - Gerekirse user değişkenini veya root_path'i ayarlayın
+Kısa açıklama:
+- GitHub API hatalarını yakalar ve anlamlı mesaj verir
+- Private repolar için GITHUB_TOKEN destekler
+- Dizin/ dosya isimlerini URL-encode eder
+- .pdf, .docx, .pptx dosyalarını indexler
 """
 
 import os
@@ -22,8 +17,8 @@ from urllib.parse import quote
 
 # --- Ayarlar (gerektiğinde değiştirin) ---
 user = "iucjeofizik"      # GitHub kullanıcı adı veya org
-repo = "ders-notlari"      # Repo adı
-branch = "main"            # Branch adı
+repo = "ders-notlari"     # Repo adı
+branch = "main"           # Branch adı
 output_file = "index.html" # Oluşturulacak HTML dosyası
 root_path = "ders-notlari" # GitHub repo içindeki dizin (ör. "ders-notlari"); boş string ise repo kökü
 
@@ -71,15 +66,15 @@ def process_folder(url, folder_name):
         print(f"Beklenen liste dönmedi for folder {folder_name}. JSON tip: {type(response)}", file=sys.stderr)
         print("JSON içerik (özet):", response, file=sys.stderr)
         return
-    html_content += f"\n<h2>{{folder_name}}</h2>\n<ul>\n"
+    html_content += f"\n<h2>{folder_name}</h2>\n<ul>\n"
     for item in response:
         if not isinstance(item, dict):
             continue
         if item.get('type') == 'file' and item.get('name','').lower().endswith(('.pdf', '.docx', '.pptx')):
             encoded_folder = quote(folder_name)
             encoded_name = quote(item['name'])
-            link = f"https://not.iücjeofizik.com/ders-notlari/{{encoded_folder}}/{{encoded_name}}"
-            html_content += f'  <li><a href="{{link}}" target="_blank">{{item["name"]}}</a></li>\n'
+            link = f"https://not.iücjeofizik.com/ders-notlari/{encoded_folder}/{encoded_name}"
+            html_content += f'  <li><a href="{link}" target="_blank">{item["name"]}</a></li>\n'
     html_content += "</ul>\n"
 
 def main():
@@ -107,7 +102,6 @@ def main():
         f.write(html_content)
 
     print(f"Index dosyası oluşturuldu: {output_file}")
-
 
 if __name__ == "__main__":
     main()
