@@ -37,16 +37,16 @@ html_header_template = """<!DOCTYPE html>
 <meta charset="UTF-8">
 <title>Ders Notları</title>
 <style>
-  body { font-family: sans-serif; line-height: 1.5; padding: 1rem; }
-  .tree { margin: 0; padding: 0; }
-  .tree ul { list-style: none; margin: 0; padding-left: 1.25rem; }
-  .caret { cursor: pointer; user-select: none; display: inline-block; }
-  .caret .symbol { display: inline-block; width: 1.0rem; }
-  .nested { display: none; }
-  .nested.active { display: block; }
-  .file a { text-decoration: none; color: #0366d6; }
-  .file a:hover { text-decoration: underline; }
-  .empty { font-style: italic; color: #888; margin-left: 1.25rem; }
+  body {{ font-family: sans-serif; line-height: 1.5; padding: 1rem; }}
+  .tree {{ margin: 0; padding: 0; }}
+  .tree ul {{ list-style: none; margin: 0; padding-left: 1.25rem; }}
+  .caret {{ cursor: pointer; user-select: none; display: inline-block; }}
+  .caret .symbol {{ display: inline-block; width: 1.0rem; }}
+  .nested {{ display: none; }}
+  .nested.active {{ display: block; }}
+  .file a {{ text-decoration: none; color: #0366d6; }}
+  .file a:hover {{ text-decoration: underline; }}
+  .empty {{ font-style: italic; color: #888; margin-left: 1.25rem; }}
 </style>
 </head>
 <body>
@@ -58,18 +58,18 @@ html_header_template = """<!DOCTYPE html>
 <hr/>
 <script>
 document.addEventListener("DOMContentLoaded", function() {{
-  var carets = document.getElementsByClassName("caret");
-  Array.prototype.forEach.call(carets, function(c) {{
-    c.addEventListener("click", function(e) {{
-      var nested = this.parentElement.querySelector(".nested");
-      if (!nested) return;
-      nested.classList.toggle("active");
-      var sym = this.querySelector(".symbol");
-      if (sym) {{
-        sym.textContent = nested.classList.contains("active") ? "▼" : "▶";
-      }}
-    }});
-  }});
+  var carets = document.getElementsByClassName("caret");
+  Array.prototype.forEach.call(carets, function(c) {{
+    c.addEventListener("click", function(e) {{
+      var nested = this.parentElement.querySelector(".nested");
+      if (!nested) return;
+      nested.classList.toggle("active");
+      var sym = this.querySelector(".symbol");
+      if (sym) {{
+        sym.textContent = nested.classList.contains("active") ? "▼" : "▶";
+      }}
+    }});
+  }});
 }});
 </script>
 """
