@@ -1,13 +1,40 @@
-import requests
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Ders notları index oluşturucu (düzgün hata kontrolü ile)
 
-# GitHub bilgileri
-user = "kullaniciAdi"      # GitHub kullanıcı adınız
-repo = "ders-notlari"           # Repo adı
+Değişiklikler:
+- GITHUB_TOKEN environment variable ile private repolar için token desteği
+- API response status ve tip kontrolü
+- requests hatalarında çıkış ve anlamlı hata mesajı
+- URL encode ile dosya ve klasör isimleri güvenli hale getirildi
+- Daha sağlam JSON parse kontrolü
+
+Kullanım:
+ - (Opsiyonel) export GITHUB_TOKEN="ghp_..." (Linux/macOS) veya set GITHUB_TOKEN on Windows
+ - Gerekirse user değişkenini veya root_path'i ayarlayın
+"""
+
+import os
+import sys
+import requests
+from urllib.parse import quote
+
+# --- Ayarlar (gerektiğinde değiştirin) ---
+user = "iucjeofizik"      # GitHub kullanıcı adı veya org
+repo = "ders-notlari"      # Repo adı
 branch = "main"            # Branch adı
 output_file = "index.html" # Oluşturulacak HTML dosyası
+root_path = "ders-notlari" # GitHub repo içindeki dizin (ör. "ders-notlari"); boş string ise repo kökü
 
-# Ana klasör URL (GitHub API)
-base_url = f"https://api.github.com/repos/{user}/{repo}/contents/ders-notlari?ref={branch}"
+# --- GitHub API URL ---
+base_url = f"https://api.github.com/repos/{user}/{repo}/contents/{root_path}?ref={branch}"
+
+# --- Headers (opsiyonel token ile) ---
+token = os.environ.get("GITHUB_TOKEN")
+headers = {"Accept": "application/vnd.github.v3+json"}
+if token:
+    headers["Authorization"] = f"token {token}"
 
 # Başlangıç HTML
 html_content = """<!DOCTYPE html>
@@ -20,29 +47,67 @@ html_content = """<!DOCTYPE html>
 <h1>Ders Notları</h1>
 """
 
-# Her klasörü işleyen fonksiyon
+def get_json(url):
+    try:
+        resp = requests.get(url, headers=headers, timeout=15)
+    except requests.RequestException as e:
+        print(f"HTTP isteği başarısız: {e}", file=sys.stderr)
+        sys.exit(1)
+    try:
+        data = resp.json()
+    except ValueError:
+        print("Sunucudan JSON parse edilemedi. Raw içerik:", resp.text, file=sys.stderr)
+        sys.exit(1)
+    if resp.status_code >= 400:
+        message = data.get("message") if isinstance(data, dict) else None
+        print(f"GitHub API hata {resp.status_code}: {message or resp.text}", file=sys.stderr)
+        sys.exit(1)
+    return data
+
 def process_folder(url, folder_name):
     global html_content
-    response = requests.get(url).json()
-    html_content += f"\n<h2>{folder_name}</h2>\n<ul>\n"
+    response = get_json(url)
+    if not isinstance(response, list):
+        print(f"Beklenen liste dönmedi for folder {folder_name}. JSON tip: {type(response)}", file=sys.stderr)
+        print("JSON içerik (özet):", response, file=sys.stderr)
+        return
+    html_content += f"\n<h2>{{folder_name}}</h2>\n<ul>\n"
     for item in response:
-        if item['type'] == 'file' and item['name'].lower().endswith(('.pdf', '.docx', '.pptx')):
-            # GitHub Pages linki
-            link = f"https://not.iücjeofizik.com/ders-notlari/{folder_name}/{item['name']}"
-            html_content += f'  <li><a href="{link}" target="_blank">{item["name"]}</a></li>\n'
+        if not isinstance(item, dict):
+            continue
+        if item.get('type') == 'file' and item.get('name','').lower().endswith(('.pdf', '.docx', '.pptx')):
+            encoded_folder = quote(folder_name)
+            encoded_name = quote(item['name'])
+            link = f"https://not.iücjeofizik.com/ders-notlari/{{encoded_folder}}/{{encoded_name}}"
+            html_content += f'  <li><a href="{{link}}" target="_blank">{{item["name"]}}</a></li>\n'
     html_content += "</ul>\n"
 
-# Ana klasördeki tüm sınıfları al
-response = requests.get(base_url).json()
-for item in response:
-    if item['type'] == 'dir':
-        process_folder(item['url'], item['name'])
+def main():
+    print("Base URL:", base_url)
+    response = get_json(base_url)
+    if isinstance(response, dict):
+        print("GitHub API beklenmeyen bir JSON döndürdü (muhtemelen hata):", file=sys.stderr)
+        print(response, file=sys.stderr)
+        sys.exit(1)
+    if not isinstance(response, list):
+        print(f"Beklenmeyen JSON tipi: {type(response)}", file=sys.stderr)
+        print(response, file=sys.stderr)
+        sys.exit(1)
 
-# HTML kapanış tagleri
-html_content += "\n</body>\n</html>"
+    for item in response:
+        if not isinstance(item, dict):
+            continue
+        if item.get('type') == 'dir':
+            process_folder(item.get('url'), item.get('name'))
 
-# Dosyayı yaz
-with open(output_file, "w", encoding="utf-8") as f:
-    f.write(html_content)
+    global html_content
+    html_content += "\n</body>\n</html>"
 
-print(f"Index dosyası oluşturuldu: {output_file}")
+    with open(output_file, "w", encoding="utf-8") as f:
+        f.write(html_content)
+
+    print(f"Index dosyası oluşturuldu: {output_file}")
+
+
+if __name__ == "__main__":
+    main()
