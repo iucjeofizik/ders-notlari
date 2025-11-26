@@ -4,35 +4,31 @@
 Tüm 'ders-notlari' dizinine eklenen dosyaları listeleyen index oluşturucu
 ve README içeriğini sayfa başlığı altında gösterir.
 
-Davranış:
- - Önce yerel README (README.md veya README.rst) aranır (çalışma dizininde veya root_path içinde).
- - Yerel README yoksa GitHub API ile repo README'si alınmaya çalışılır.
- - Eğer 'markdown' paketi yüklüyse README Markdown -> HTML dönüştürülür.
- - markdown yoksa README <pre> içinde ham metin olarak gösterilir.
+Bu sürüm:
+ - Orijinal davranışı korur (README yerel veya GitHub API'den alınır, dosyalar
+   recursive olarak GitHub Contents API ile toplanır).
+ - CLI argümanları eklendi; varsayılanlar eski dosyayla aynı.
+ - Workflow içinde kullanılmaya uygundur (GITHUB_TOKEN varsa kullanır).
 """
+from __future__ import annotations
+
 import os
 import sys
 import requests
 import base64
 import html
-from urllib.parse import quote
+import argparse
+from urllib.parse import quote, urljoin
 
-# --- Ayarlar ---
-user = "iucjeofizik"
-repo = "ders-notlari"
-branch = "main"
-output_file = "index.html"
-root_path = "ders-notlari"  # repo içindeki başlangıç dizini; boş string ise repo kökü
-base_site = "https://not.iücjeofizik.com/ders-notlari"
+# --- Varsayılan ayarlar (orijinal haliyle) ---
+DEFAULT_USER = "iucjeofizik"
+DEFAULT_REPO = "ders-notlari"
+DEFAULT_BRANCH = "main"
+DEFAULT_OUTPUT_FILE = "index.html"
+DEFAULT_ROOT_PATH = "ders-notlari"  # repo içindeki başlangıç dizini; boş string ise repo kökü
+DEFAULT_BASE_SITE = "https://not.iücjeofizik.com/ders-notlari"
 
-# GitHub API
-base_url = f"https://api.github.com/repos/{user}/{repo}/contents/{root_path}?ref={branch}"
-readme_api_url = f"https://api.github.com/repos/{user}/{repo}/readme?ref={branch}"
-token = os.environ.get("GITHUB_TOKEN")
-headers = {"Accept": "application/vnd.github.v3+json"}
-if token:
-    headers["Authorization"] = f"token {token}"
-
+# --- HTML şablonları ---
 html_header_template = """<!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -52,9 +48,19 @@ html_footer = """
 </html>
 """
 
-def get_json(url):
+# --- Helpers ---
+def build_api_urls(user: str, repo: str, branch: str, root_path: str):
+    # Contents API URL for root_path (if root_path empty, query repo root)
+    if root_path:
+        contents_url = f"https://api.github.com/repos/{user}/{repo}/contents/{root_path}?ref={branch}"
+    else:
+        contents_url = f"https://api.github.com/repos/{user}/{repo}/contents?ref={branch}"
+    readme_api_url = f"https://api.github.com/repos/{user}/{repo}/readme?ref={branch}"
+    return contents_url, readme_api_url
+
+def get_json(url: str, headers: dict, timeout: int = 15):
     try:
-        resp = requests.get(url, headers=headers, timeout=15)
+        resp = requests.get(url, headers=headers, timeout=timeout)
     except requests.RequestException as e:
         print(f"HTTP isteği başarısız: {e}", file=sys.stderr)
         sys.exit(1)
@@ -69,7 +75,7 @@ def get_json(url):
         sys.exit(1)
     return data
 
-def try_local_readme():
+def try_local_readme(root_path: str):
     """
     Yerel README dosyalarını kontrol et.
     Öncelik: ./README.md, ./README.rst, ./{root_path}/README.md, ./{root_path}/README.rst
@@ -91,7 +97,7 @@ def try_local_readme():
                 print(f"Yerel README okunamadı: {p} -> {e}", file=sys.stderr)
     return None, None
 
-def try_github_readme_via_api():
+def try_github_readme_via_api(readme_api_url: str, headers: dict):
     """
     GitHub API /repos/{owner}/{repo}/readme endpoint'inden README'yi al.
     Döndürür (text, format) veya (None, None).
@@ -103,6 +109,7 @@ def try_github_readme_via_api():
         return None, None
     if resp.status_code != 200:
         # hata, geri dön
+        # Not: GitHub API bazen 403 rate limit dönüşü yapabilir; hata mesajını yazdır
         print(f"GitHub README alınamadı: status {resp.status_code} - {resp.text}", file=sys.stderr)
         return None, None
     try:
@@ -112,7 +119,7 @@ def try_github_readme_via_api():
         return None, None
     content_b64 = data.get("content")
     encoding = data.get("encoding")
-    name = data.get("name","README")
+    name = data.get("name", "README")
     if not content_b64 or encoding != "base64":
         return None, None
     try:
@@ -126,7 +133,7 @@ def try_github_readme_via_api():
         return decoded, "rst"
     return decoded, "text"
 
-def render_readme_to_html(text, fmt):
+def render_readme_to_html(text: str, fmt: str):
     """
     Eğer 'markdown' paketi yüklüyse md -> HTML çevir, yoksa <pre> içinde ham göster.
     RST için dönüşüm yapılmıyor (pre içine konur) — isterseniz docutils eklenebilir.
@@ -140,16 +147,18 @@ def render_readme_to_html(text, fmt):
             html_out = markdown.markdown(text, extensions=['fenced_code', 'tables'])
             return html_out
         except Exception:
-            # markdown yoksa ham göster
             safe = html.escape(text)
             return f"<pre>{safe}</pre>"
     else:
-        # rst veya text - ham göster
         safe = html.escape(text)
         return f"<pre>{safe}</pre>"
 
-def collect_files(url, collected):
-    response = get_json(url)
+def collect_files(url: str, headers: dict, collected: list):
+    """
+    GitHub Contents API result listesini dolaşır; dosyaları collected listesine ekler.
+    Eğer item type 'dir' ise item['url'] (API url) ile recursive çağrı yapar.
+    """
+    response = get_json(url, headers)
     if not isinstance(response, list):
         print(f"Beklenen liste dönmedi: {type(response)} - içerik: {response}", file=sys.stderr)
         return
@@ -163,9 +172,17 @@ def collect_files(url, collected):
                 "name": item.get('name'),
             })
         elif itype == 'dir':
-            collect_files(item.get('url'), collected)
+            child_url = item.get('url')
+            if child_url:
+                collect_files(child_url, headers, collected)
 
-def make_link_for_item(item_path):
+def make_link_for_item(item_path: str, base_site: str, root_path: str):
+    """
+    Repo içindeki path'ten dış site linki üretir.
+    Örneğin base_site = https://not.iücjeofizik.com/ders-notlari
+    Eğer root_path ayarlıysa ve path root_path/ ile başlıyorsa relative kısmı alır.
+    Sonrasında quote ile güvenli hale getirir.
+    """
     path = item_path or ""
     if root_path:
         prefix = root_path.rstrip('/') + '/'
@@ -176,18 +193,46 @@ def make_link_for_item(item_path):
     else:
         rel = path
     encoded = quote(rel, safe="/")
-    return f"{base_site}/{encoded}"
+    # ensure no double slashes
+    return f"{base_site.rstrip('/')}/{encoded.lstrip('/')}"
+
+# --- CLI ve main ---
+def parse_args():
+    p = argparse.ArgumentParser(description="Generate index.html for ders-notlari")
+    p.add_argument("--user", default=DEFAULT_USER, help="GitHub kullanıcı/owner (default from script)")
+    p.add_argument("--repo", default=DEFAULT_REPO, help="Repo adı (default from script)")
+    p.add_argument("--branch", default=DEFAULT_BRANCH, help="Branch (default main)")
+    p.add_argument("--root-path", default=DEFAULT_ROOT_PATH, help="Repo içindeki başlangıç dizini (default 'ders-notlari')")
+    p.add_argument("--output", default=DEFAULT_OUTPUT_FILE, help="Çıktı HTML dosyası (default index.html)")
+    p.add_argument("--base-site", default=DEFAULT_BASE_SITE, help="Buraya dosya linkleri yönlendirilecek (ör: site root)")
+    return p.parse_args()
 
 def main():
-    # README al (önce yerel, sonra API)
-    readme_text, readme_fmt = try_local_readme()
+    args = parse_args()
+
+    user = args.user
+    repo = args.repo
+    branch = args.branch
+    output_file = args.output
+    root_path = args.root_path
+    base_site = args.base_site
+
+    # GitHub API
+    contents_url, readme_api_url = build_api_urls(user, repo, branch, root_path)
+    token = os.environ.get("GITHUB_TOKEN")
+    headers = {"Accept": "application/vnd.github.v3+json"}
+    if token:
+        headers["Authorization"] = f"token {token}"
+
+    # README: önce local, sonra GitHub API
+    readme_text, readme_fmt = try_local_readme(root_path)
     if readme_text is None:
-        readme_text, readme_fmt = try_github_readme_via_api()
+        readme_text, readme_fmt = try_github_readme_via_api(readme_api_url, headers)
     readme_html = render_readme_to_html(readme_text, readme_fmt)
 
     # dosyaları topla
     files = []
-    collect_files(base_url, files)
+    collect_files(contents_url, headers, files)
     files.sort(key=lambda x: x['path'] or "")
 
     # HTML oluştur
@@ -199,14 +244,22 @@ def main():
         for f in files:
             path = f.get('path', '')
             name = f.get('name', '')
-            link = make_link_for_item(path)
+            link = make_link_for_item(path, base_site, root_path)
             if root_path and path.startswith(root_path.rstrip('/') + '/'):
                 display_path = path[len(root_path.rstrip('/') + '/'):]
             else:
                 display_path = path
-            html_parts.append(f'  <li><a href="{link}" target="_blank">{display_path or name}</a> <small>({name})</small></li>\n')
+            html_parts.append(f'  <li><a href="{html.escape(link)}" target="_blank" rel="noopener noreferrer">{html.escape(display_path or name)}</a> <small>({html.escape(name)})</small></li>\n')
     html_parts.append("</ul>\n")
     html_parts.append(html_footer)
+
+    # ensure output directory exists
+    out_dir = os.path.dirname(output_file)
+    if out_dir:
+        try:
+            os.makedirs(out_dir, exist_ok=True)
+        except Exception:
+            pass
 
     with open(output_file, "w", encoding="utf-8") as f:
         f.write(''.join(html_parts))
